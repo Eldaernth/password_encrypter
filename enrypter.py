@@ -1,14 +1,13 @@
-def menu():
-    passwords = []
+def menu(passwords):
     print("1.Show passwords\n2.Add new password\n3.Delete password\n4.Exit")
     choice = get_user_input("Enter a number: ")
     if choice == "1":
-        show_passwords(read_from_file())
+        show_passwords(passwords)
     elif choice == "2":
         passwords.append(crypting())
         add_to_file(passwords)
     elif choice == "3":
-        delete_pass()
+        delete_pass(passwords)
     elif choice == "4":
         exit()
     else:
@@ -20,14 +19,15 @@ def get_user_input(label):
 
 
 def add_to_file(passwords):
-    stored_passwords = open("passwords.txt","a")
-    stored_passwords.write("\t".join(passwords[-1]) + "\n")
+    with open("passwords.txt","w") as stored_passwords:
+        for i in passwords:
+            stored_passwords.write(i)
 
 
 
 def read_from_file():
-    stored_passwords = open("passwords.txt","r")
-    return stored_passwords.readlines()
+    with open("passwords.txt","r") as stored_passwords:
+        return stored_passwords.readlines()
 
 
 def show_passwords(passwords):
@@ -36,27 +36,29 @@ def show_passwords(passwords):
 
 
 def delete_pass(passwords):
-    password = get_user_input("")
+    password = get_user_input("Enter password: ")
     for i in passwords:
-        if password == i:
-            
+        if password == i.split("\t")[0]:
+            passwords.remove(i)
+    add_to_file(passwords)
 
 
 def crypting():
     list_of_letters = ["a", "b", "c" ,"d" ,"e" ,"f" ,"g" ,"h" ,"i" ,"j" ,"k" ,
                         "l" ,"m" ,"n" ,"o" ,"p" ,"q" ,"r" ,"s" ,"t" ,"u" ,"v" ,"w" ,"x" ,"y" ,"z",
-                        "0","1","2","3","4","5","6","7","8","9"," "]
-    password = get_user_input("Enter password: ")
-    list_of_passwords = list(password)
+                        "0","1","2","3","4","5","6","7","8","9"," ",",",".","_"]
+    password = list(get_user_input("Enter password: "))
     crypted_password = []
-    for chars in list_of_passwords:
+    for chars in password:
         crypted_password.append(list_of_letters[list_of_letters.index(chars) - 3])
-    return [password,"".join(crypted_password)]
+    string_password = "{}\t{}\n".format("".join(password),"".join(crypted_password))
+    return string_password
 
 
 def main():
     while True:
-        menu()
+        passwords = [x for x in read_from_file()]
+        menu(passwords)
     
 
 if __name__ == "__main__":
